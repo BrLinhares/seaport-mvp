@@ -34,6 +34,12 @@ logs/
 
 # ── Docker ────────────────────────────────────────
 .docker/
+docker-compose.override.yml
+
+# ── Uploads (arquivos gerados em runtime — não versionar) ─
+seaport-backend/uploads/
+uploads/
 
 # ── OS ────────────────────────────────────────────
 Thumbs.db
+desktop.ini
