@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: seaport-postgres
+    environment:
+      POSTGRES_DB: seaportdb
+      POSTGRES_USER: seaport
+      POSTGRES_PASSWORD: seaport123
+    ports:
+      - "5433:5432"   # 5432 pode estar em uso por outro projeto; container interno continua em 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seaport -d seaportdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MailHog (servidor SMTP fake para dev) ───────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: seaport-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    restart: unless-stopped
+
+  # ── Backend ─────────────────────────────────────────────
+  backend:
+    build: ./seaport-backend
+    container_name: seaport-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: seaportdb
+      DB_USERNAME: seaport
+      DB_PASSWORD: seaport123
+      JWT_SECRET: docker-dev-secret-change-in-production-min32chars
+      FRONTEND_URL: http://localhost
+      CORS_ALLOWED_ORIGINS: http://localhost,http://localhost:80,http://localhost:5173
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      # Sobrescreve application-prod.properties para ambiente Docker (sem SSL, com schema auto)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/seaportdb?sslmode=disable
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # MailHog não usa auth nem TLS
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # ── Frontend ────────────────────────────────────────────
+  frontend:
+    build: ./seaport-frontend
+    container_name: seaport-frontend
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

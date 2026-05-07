@@ -1,0 +1,39 @@
+# ── Java / Maven ──────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+.mvn/
+mvnw
+mvnw.cmd
+
+# ── Spring / IDE ──────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.suo
+.DS_Store
+
+# ── Node / React ──────────────────────────────────
+node_modules/
+dist/
+.cache/
+*.local
+
+# ── Environment (NUNCA commitar!) ─────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+seaport-backend/.env
+seaport-frontend/.env
+
+# ── Logs ──────────────────────────────────────────
+*.log
+logs/
+
+# ── Docker ────────────────────────────────────────
+.docker/
+
+# ── OS ────────────────────────────────────────────
+Thumbs.db
