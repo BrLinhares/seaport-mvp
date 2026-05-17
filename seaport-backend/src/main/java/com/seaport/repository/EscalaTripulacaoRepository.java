@@ -41,7 +41,7 @@ public interface EscalaTripulacaoRepository extends JpaRepository<EscalaTripulac
     @Query("""
         SELECT COUNT(e) > 0 FROM EscalaTripulacao e
         WHERE e.embarcacao.id = :embarcacaoId
-          AND LOWER(e.funcao) = LOWER(:funcao)
+          AND LOWER(e.funcao) = LOWER(cast(:funcao as string))
           AND e.turno = :turno
           AND e.ativo = true
           AND e.dataFim IS NULL
@@ -54,7 +54,7 @@ public interface EscalaTripulacaoRepository extends JpaRepository<EscalaTripulac
     @Query("""
         SELECT COUNT(e) > 0 FROM EscalaTripulacao e
         WHERE e.embarcacao.id = :embarcacaoId
-          AND LOWER(e.funcao) = LOWER(:funcao)
+          AND LOWER(e.funcao) = LOWER(cast(:funcao as string))
           AND e.turno = :turno
           AND e.ativo = true
           AND e.dataFim IS NULL

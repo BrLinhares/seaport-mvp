@@ -28,7 +28,7 @@ public interface TripulanteRepository extends JpaRepository<Tripulante, Long> {
         SELECT t FROM Tripulante t
         WHERE (:embarcacaoId IS NULL OR t.embarcacao.id = :embarcacaoId)
           AND (:ativo IS NULL OR t.ativo = :ativo)
-          AND (:nome IS NULL OR LOWER(t.nomeCompleto) LIKE LOWER(CONCAT('%', :nome, '%')))
+          AND (cast(:nome as string) IS NULL OR LOWER(t.nomeCompleto) LIKE LOWER(CONCAT('%', cast(:nome as string), '%')))
         ORDER BY t.nomeCompleto
         """)
     Page<Tripulante> buscarComFiltros(
