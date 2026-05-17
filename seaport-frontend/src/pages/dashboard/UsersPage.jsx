@@ -40,7 +40,7 @@ function ModalCreateUser({ embarcacoes, onClose, onSuccess }) {
       await usersApi.criar(data)
       onSuccess()
     } catch (e) {
-      setError(e?.response?.data?.message ?? 'Erro ao criar usuário.')
+      setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Erro ao criar usuário.')
     }
   }
 
@@ -136,7 +136,7 @@ function ModalEditUser({ user, embarcacoes, onClose, onSuccess }) {
       })
       onSuccess()
     } catch (e) {
-      setError(e?.response?.data?.message ?? 'Erro ao atualizar usuário.')
+      setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Erro ao atualizar usuário.')
     }
   }
 
@@ -205,7 +205,7 @@ function ModalResetPassword({ user, onClose, onSuccess }) {
       await usersApi.resetarSenha(user.id, data.newPassword)
       onSuccess()
     } catch (e) {
-      setError(e?.response?.data?.message ?? 'Erro ao resetar senha.')
+      setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Erro ao resetar senha.')
     }
   }
 
@@ -291,7 +291,7 @@ export default function UsersPage() {
       const data = await usersApi.listar()
       setUsers(data)
     } catch (e) {
-      setError(e?.response?.data?.message ?? 'Erro ao carregar usuários.')
+      setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Erro ao carregar usuários.')
     } finally {
       setLoading(false)
     }
@@ -325,11 +325,11 @@ export default function UsersPage() {
   async function handleToggle() {
     setToggleLoading(true)
     try {
-      await usersApi.toggleEnabled(selectedUser.id)
+      await usersApi.toggleStatus(selectedUser.id)
       closeModal()
       await loadUsers()
     } catch (e) {
-      setError(e?.response?.data?.message ?? 'Erro ao alterar status.')
+      setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Erro ao alterar status.')
       closeModal()
     } finally {
       setToggleLoading(false)

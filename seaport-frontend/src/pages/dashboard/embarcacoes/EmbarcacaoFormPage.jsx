@@ -123,7 +123,7 @@ export default function EmbarcacaoFormPage() {
       }
       navigate('/dashboard/embarcacoes')
     } catch (err) {
-      setApiError(err?.response?.data?.message || 'Erro ao salvar. Tente novamente.')
+      setApiError(err?.response?.data?.error ?? err?.response?.data?.message ?? 'Erro ao salvar. Tente novamente.')
     } finally {
       setSubmitLoading(false)
     }
