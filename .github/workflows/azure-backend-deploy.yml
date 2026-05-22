@@ -1,0 +1,36 @@
+name: Deploy Backend → Azure App Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'seaport-backend/**'
+      - '.github/workflows/azure-backend-deploy.yml'
+  workflow_dispatch:   # permite disparo manual pelo GitHub
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build com Maven (sem testes)
+        run: |
+          cd seaport-backend
+          mvn clean package -DskipTests -B
+
+      - name: Deploy para Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: seaport-backend/target/seaport-backend-1.0.0.jar
