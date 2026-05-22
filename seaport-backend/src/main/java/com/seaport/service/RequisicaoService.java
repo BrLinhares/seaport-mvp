@@ -45,13 +45,15 @@ public class RequisicaoService {
     @PostConstruct
     public void init() {
         try {
-            Path p = Paths.get(logoPath);
-            if (Files.exists(p)) {
-                byte[] bytes = Files.readAllBytes(p);
+            // Usa ClassPathResource para ler de dentro do resources/jar
+            org.springframework.core.io.ClassPathResource resource = new org.springframework.core.io.ClassPathResource(logoPath);
+
+            if (resource.exists()) {
+                byte[] bytes = resource.getInputStream().readAllBytes();
                 logoDataUri = "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
-                log.info("Logo PDF carregada: {}", p.toAbsolutePath());
+                log.info("Logo PDF carregada com sucesso do classpath: {}", logoPath);
             } else {
-                log.warn("Logo PDF não encontrada em: {}. PDF gerado sem logo.", p.toAbsolutePath());
+                log.warn("Logo PDF não encontrada no classpath: {}. PDF gerado sem logo.", logoPath);
             }
         } catch (Exception e) {
             log.warn("Erro ao carregar logo PDF: {}", e.getMessage());
