@@ -12,8 +12,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,29 +25,35 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
+          cache: maven
 
       - name: Build with Maven
-        run: mvn clean install
+        run: |
+          cd seaport-backend
+          mvn clean package -DskipTests -B
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: '${{ github.workspace }}/seaport-backend/target/*.jar'
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-  
+      id-token: write
+      contents: read
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -60,4 +68,3 @@ jobs:
           app-name: 'seaport-api'
           slot-name: 'Production'
           package: '*.jar'
-          
